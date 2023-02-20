@@ -1,6 +1,3 @@
-from flask import Flask, request, abort, jsonify
-from flask_restful import Resource, Api
-from marshmallow import Schema, fields
 # Работа с массивами данных
 import numpy as np
 from tensorflow.keras.models import model_from_json
@@ -10,19 +7,6 @@ from tensorflow.keras import utils
 from sklearn.preprocessing import StandardScaler
 import joblib
 
-# http://127.0.0.1:5000/cla?number_lines=100&customer_type=Business%20Customer%20Account&customer_sub_segment=Fixed%20UAE
-# http://127.0.0.1:5000/cla?number_lines=10&customer_type=Residential%20Customer%20Account&customer_sub_segment=Fixed%20UAE
-
-
-# Открываем json файл разметки модели
-json_file = open('model.json','r')
-loaded_model_json = json_file.read() # считываем
-json_file.close() # закрываем
-loaded_model = model_from_json(loaded_model_json) # используем керас, чтобы считать разметку архитектуры
-loaded_model.summary()
-loaded_model.load_weights("model.h5") # подгружаем веса
-print("Загружено с диска")
-
 # Для нормализации данных используется готовый инструмент
 y_scaler = StandardScaler()
 y_scaler = joblib.load('std_scaler.bin')
@@ -31,8 +15,8 @@ MAX_NUMBER_LINES = 300
 
 # Классы CUSTOMER_TYPE
 CUSTOMER_TYPE_class = [0,
-                    {'Business Customer Account	'          : 0,
-                     'Residential Customer Account' : 1
+                    {'Business Customer Account	'  : 0,
+                     'Residential Customer Account': 1
                     }]
 # Классы CUSTOMER_SUB_SEGMENT
 CUSTOMER_SUB_SEGMENT_class = [0,
@@ -77,18 +61,16 @@ def extract_CUSTOMER_TYPE_to_multi(arg):
 def extract_NUMBER_LINES_Category(arg, MAX_NUMBER_LINES):
   NUMBER_LINES = utils.to_categorical(arg, MAX_NUMBER_LINES+1) #Превращаем в категорию
   return NUMBER_LINES
-
-class ClaQuerySchema(Schema):
-    number_lines = fields.Int(required=True)
-    customer_type = fields.Str(required=True)
-    customer_sub_segment = fields.Str(required=True)
-
-app = Flask(__name__)
-api = Api(app)
-schema = ClaQuerySchema()
-
-
-class ClaAPI(Resource):
+class ClaAi:
+    def __init__(self):
+        # Открываем json файл разметки модели
+        json_file = open('model.json', 'r')
+        loaded_model_json = json_file.read()  # считываем
+        json_file.close()  # закрываем
+        self.loaded_model = model_from_json(loaded_model_json)  # используем керас, чтобы считать разметку архитектуры
+        self.loaded_model.summary()
+        self.loaded_model.load_weights("model.h5")  # подгружаем веса
+        print("Загружено с диска")
 
     def data_preparation(self, NUMBER_LINES, CUSTOMER_TYPE, CUSTOMER_SUB_SEGMENT):
         NUMBER_LINES_vec = extract_NUMBER_LINES_Category(NUMBER_LINES, MAX_NUMBER_LINES)
@@ -107,7 +89,7 @@ class ClaAPI(Resource):
     def predict(self, number_lines, customer_type, customer_sub_segment):
         x_data = self.data_preparation(number_lines, customer_type, customer_sub_segment)
         print (f'x_data = {x_data}')
-        pred = loaded_model.predict(x_data)  # Предсказание на тренировочной выборке
+        pred = self.loaded_model.predict(x_data)  # Предсказание на тренировочной выборке
         pred = y_scaler.inverse_transform(pred)
         print(type(pred))
         print(pred.shape)
@@ -119,24 +101,3 @@ class ClaAPI(Resource):
               'customer_type': customer_type,
               'customer_sub_segment': customer_sub_segment}
         return cl
-    def get(self):
-        errors = schema.validate(request.args)
-        if errors:
-            abort(400, str(errors))
-
-        args = request.args
-        print(args)  # For debugging
-        number_lines = args['number_lines']
-        customer_type = args['customer_type']
-        customer_sub_segment = args['customer_sub_segment']
-        cl = self.predict(number_lines, customer_type, customer_sub_segment)
-
-        return jsonify(cl)
-
-
-
-api.add_resource(ClaAPI, '/cla', endpoint='cla')
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
