@@ -113,7 +113,6 @@ class ClaAPI(Resource):
         print(pred)
         print(pred[0][0])
         cla = int(pred[0][0])
-        # TODO
         cl = {'cl': cla,
               'number_lines': number_lines,
               'customer_type': customer_type,
