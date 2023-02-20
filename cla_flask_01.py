@@ -10,7 +10,8 @@ from tensorflow.keras import utils
 from sklearn.preprocessing import StandardScaler
 import joblib
 
-# http://127.0.0.1:5000/cla?number_lines=111&customer_type=Business%20Customer%20Account&customer_sub_segment=Fixed%20UAE
+# http://127.0.0.1:5000/cla?number_lines=100&customer_type=Business%20Customer%20Account&customer_sub_segment=Fixed%20UAE
+# http://127.0.0.1:5000/cla?number_lines=10&customer_type=Residential%20Customer%20Account&customer_sub_segment=Fixed%20UAE
 
 
 # Открываем json файл разметки модели
