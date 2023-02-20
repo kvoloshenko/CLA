@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 /model.h5
 /model.json
+/std_scaler.bin
