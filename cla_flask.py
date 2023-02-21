@@ -1,12 +1,13 @@
-from flask import Flask, request, abort, jsonify
-from flask_restful import Resource, Api
-from marshmallow import Schema, fields
-from cla_ai import ClaAi
-
+# Credit Limit Assessment (CLA)
+# https://github.com/kvoloshenko/CLA.git
 # https://colab.research.google.com/drive/1gI6Q9WkhGo1uylw0rPKzhsy_xSDBToaV?usp=sharing
 # http://127.0.0.1:5000/cla/api/v1.0/predict?number_lines=10&customer_type=Residential%20Customer%20Account&customer_sub_segment=Fixed%20UAE
 # http://127.0.0.1:5000/cla/api/v1.0/predict?number_lines=100&customer_type=Business%20Customer%20Account&customer_sub_segment=Fixed%20UAE
 
+from flask import Flask, request, abort, jsonify
+from flask_restful import Resource, Api
+from marshmallow import Schema, fields
+from cla_ai import ClaAi
 
 cla_ai = ClaAi()
 
