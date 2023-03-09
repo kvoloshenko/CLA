@@ -7,5 +7,7 @@ Files that need to be copied from colab after training the neural network to the
 
 
 std_scaler.bin - binary for restoring normalized values
+
 model.h5 - trained neuron weights in HDF5 format
+
 model.json - structure of the neuron model in JSON format
