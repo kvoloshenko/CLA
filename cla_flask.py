@@ -38,7 +38,7 @@ class ClaAPI(Resource):
         return jsonify(cl)
 
 
-api.add_resource(ClaAPI, '  t')
+api.add_resource(ClaAPI, '/cla/api/v1.0/predict')
 
 
 if __name__ == '__main__':
